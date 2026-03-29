@@ -1,0 +1,52 @@
+{
+  "manifest_version": 3,
+  "name": "StockVision — Indian Stock Quick Lookup",
+  "short_name": "StockVision",
+  "description": "Instantly look up NSE/BSE stock prices, add to watchlist, and get alerts — right from your Chrome toolbar.",
+  "version": "1.0.0",
+  "icons": {
+    "16":  "icons/icon16.png",
+    "32":  "icons/icon32.png",
+    "48":  "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "action": {
+    "default_popup":  "popup.html",
+    "default_title":  "StockVision",
+    "default_icon": {
+      "16":  "icons/icon16.png",
+      "32":  "icons/icon32.png"
+    }
+  },
+  "permissions": [
+    "storage",
+    "alarms",
+    "notifications"
+  ],
+  "host_permissions": [
+    "http://localhost:5000/*",
+    "https://stockvision.in/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.screener.in/*",
+        "https://www.moneycontrol.com/*",
+        "https://finance.yahoo.com/*",
+        "https://economictimes.indiatimes.com/*"
+      ],
+      "js":  ["content.js"],
+      "css": ["content.css"]
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["icons/*", "content.css"],
+      "matches":   ["<all_urls>"]
+    }
+  ],
+  "options_page": "options.html"
+}

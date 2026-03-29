@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StockVision</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      width: 360px;
+      min-height: 480px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+    }
+
+    /* ── Header ─────────────────────────────────────────────────────────────── */
+    .header {
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      border-bottom: 1px solid #1e293b;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .logo-icon {
+      width: 28px; height: 28px;
+      background: #2563eb;
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px;
+    }
+    .logo-text { font-weight: 700; font-size: 15px; color: #fff; }
+    .ribbon {
+      margin-left: auto;
+      display: flex; gap: 8px;
+      font-size: 11px; color: #64748b;
+    }
+    .ribbon span { color: #94a3b8; }
+    .ribbon .up   { color: #22c55e; }
+    .ribbon .down { color: #ef4444; }
+
+    /* ── Search ──────────────────────────────────────────────────────────────── */
+    .search-wrap {
+      padding: 12px 16px 8px;
+      position: relative;
+    }
+    .search-input {
+      width: 100%;
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      padding: 9px 12px 9px 36px;
+      font-size: 13px;
+      color: #f1f5f9;
+      outline: none;
+      transition: border-color .2s;
+    }
+    .search-input:focus { border-color: #2563eb; }
+    .search-input::placeholder { color: #475569; }
+    .search-icon {
+      position: absolute; left: 28px; top: 50%; transform: translateY(-50%);
+      color: #475569; font-size: 14px; pointer-events: none;
+    }
+
+    /* ── Autocomplete ────────────────────────────────────────────────────────── */
+    .autocomplete {
+      margin: 0 16px;
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .autocomplete-item {
+      padding: 9px 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      border-bottom: 1px solid #0f172a;
+      transition: background .15s;
+    }
+    .autocomplete-item:last-child { border-bottom: none; }
+    .autocomplete-item:hover { background: #334155; }
+    .ac-symbol { font-weight: 700; color: #60a5fa; min-width: 80px; font-size: 11px; }
+    .ac-name   { color: #94a3b8; font-size: 11px; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    /* ── Stock Card ──────────────────────────────────────────────────────────── */
+    .stock-card {
+      margin: 8px 16px;
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 14px;
+    }
+    .stock-name   { font-size: 11px; color: #64748b; margin-bottom: 2px; }
+    .stock-symbol { font-size: 15px; font-weight: 700; color: #f8fafc; }
+    .price-row {
+      display: flex; align-items: baseline; gap: 8px; margin: 8px 0;
+    }
+    .price        { font-size: 24px; font-weight: 800; color: #f8fafc; }
+    .change       { font-size: 13px; font-weight: 600; padding: 2px 7px; border-radius: 6px; }
+    .change.up    { background: #14532d; color: #4ade80; }
+    .change.down  { background: #450a0a; color: #f87171; }
+
+    .ohlc-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 6px; margin-top: 10px;
+    }
+    .ohlc-item { background: #0f172a; border-radius: 8px; padding: 7px 10px; }
+    .ohlc-label { font-size: 9px; color: #475569; text-transform: uppercase; letter-spacing: .5px; }
+    .ohlc-val   { font-size: 13px; font-weight: 600; color: #cbd5e1; margin-top: 2px; }
+
+    .week52 {
+      margin-top: 10px;
+      background: #0f172a;
+      border-radius: 8px;
+      padding: 8px 10px;
+    }
+    .week52-label { font-size: 9px; color: #475569; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; }
+    .week52-bar   { height: 5px; background: #1e293b; border-radius: 999px; position: relative; margin-bottom: 4px; }
+    .week52-fill  { height: 100%; border-radius: 999px; background: #2563eb; }
+    .week52-ends  { display: flex; justify-content: space-between; font-size: 10px; color: #475569; }
+
+    /* ── Actions ─────────────────────────────────────────────────────────────── */
+    .actions {
+      display: flex; gap: 8px; margin: 8px 16px;
+    }
+    .btn {
+      flex: 1; padding: 8px 0; border-radius: 8px; font-size: 12px;
+      font-weight: 600; cursor: pointer; border: none; transition: opacity .2s;
+    }
+    .btn:hover { opacity: .85; }
+    .btn-primary   { background: #2563eb; color: #fff; }
+    .btn-watchlist { background: #1e293b; color: #fbbf24; border: 1px solid #334155; }
+    .btn-alert     { background: #1e293b; color: #a78bfa; border: 1px solid #334155; }
+
+    /* ── Quick Watchlist ─────────────────────────────────────────────────────── */
+    .section-title { font-size: 10px; color: #475569; text-transform: uppercase; letter-spacing: .8px; padding: 8px 16px 4px; }
+    .watchlist-grid {
+      padding: 0 16px 4px;
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+    .wl-item {
+      background: #1e293b;
+      border: 1px solid #1e293b;
+      border-radius: 9px;
+      padding: 8px 10px;
+      cursor: pointer;
+      transition: border-color .15s;
+    }
+    .wl-item:hover { border-color: #334155; }
+    .wl-sym   { font-size: 11px; font-weight: 700; color: #93c5fd; }
+    .wl-price { font-size: 13px; font-weight: 700; color: #f8fafc; }
+    .wl-chg   { font-size: 10px; }
+    .wl-chg.up   { color: #4ade80; }
+    .wl-chg.down { color: #f87171; }
+
+    /* ── Footer ──────────────────────────────────────────────────────────────── */
+    .footer {
+      border-top: 1px solid #1e293b;
+      padding: 8px 16px;
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 10px; color: #334155;
+    }
+    .footer a { color: #475569; text-decoration: none; }
+    .footer a:hover { color: #94a3b8; }
+
+    /* ── Skeleton ────────────────────────────────────────────────────────────── */
+    .skeleton { background: #1e293b; border-radius: 6px; animation: pulse 1.4s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+    /* ── Toast ───────────────────────────────────────────────────────────────── */
+    .toast {
+      position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%);
+      background: #1e293b; border: 1px solid #334155; border-radius: 8px;
+      padding: 7px 14px; font-size: 11px; color: #94a3b8;
+      opacity: 0; transition: opacity .3s; pointer-events: none; white-space: nowrap;
+    }
+    .toast.show { opacity: 1; }
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+<!-- Header with market ribbon -->
+<div class="header">
+  <div class="logo-icon">📈</div>
+  <span class="logo-text">StockVision</span>
+  <div class="ribbon" id="ribbon">
+    <span>NIFTY <span class="up" id="niftyVal">--</span></span>
+    <span>SENSEX <span id="sensexVal">--</span></span>
+  </div>
+</div>
+
+<!-- Search -->
+<div class="search-wrap">
+  <span class="search-icon">🔍</span>
+  <input
+    class="search-input"
+    id="searchInput"
+    type="text"
+    placeholder="Search NSE stocks... (e.g. TCS)"
+    autocomplete="off"
+  />
+</div>
+
+<!-- Autocomplete results -->
+<div class="autocomplete hidden" id="autocomplete"></div>
+
+<!-- Stock card (shown after search) -->
+<div class="stock-card hidden" id="stockCard">
+  <div class="stock-name" id="stockName">--</div>
+  <div class="stock-symbol" id="stockSymbol">--</div>
+  <div class="price-row">
+    <span class="price" id="stockPrice">--</span>
+    <span class="change" id="stockChange">--</span>
+  </div>
+  <div class="ohlc-grid">
+    <div class="ohlc-item"><div class="ohlc-label">Open</div><div class="ohlc-val" id="ohlcO">--</div></div>
+    <div class="ohlc-item"><div class="ohlc-label">High</div><div class="ohlc-val" id="ohlcH">--</div></div>
+    <div class="ohlc-item"><div class="ohlc-label">Low</div> <div class="ohlc-val" id="ohlcL">--</div></div>
+    <div class="ohlc-item"><div class="ohlc-label">Volume</div><div class="ohlc-val" id="ohlcV">--</div></div>
+  </div>
+  <div class="week52">
+    <div class="week52-label">52-Week Range</div>
+    <div class="week52-bar"><div class="week52-fill" id="w52bar" style="width:0%"></div></div>
+    <div class="week52-ends">
+      <span id="w52low">--</span>
+      <span id="w52high">--</span>
+    </div>
+  </div>
+</div>
+
+<!-- Action buttons -->
+<div class="actions hidden" id="actionButtons">
+  <button class="btn btn-primary"    id="btnView">View Analysis</button>
+  <button class="btn btn-watchlist"  id="btnWatchlist">+ Watchlist</button>
+  <button class="btn btn-alert"      id="btnAlert">🔔 Alert</button>
+</div>
+
+<!-- Watchlist quick view -->
+<div id="watchlistSection">
+  <div class="section-title">Quick Watchlist</div>
+  <div class="watchlist-grid" id="watchlistGrid">
+    <!-- filled by JS -->
+  </div>
+</div>
+
+<!-- Footer -->
+<div class="footer">
+  <span>StockVision v1.0</span>
+  <span><a href="#" id="settingsLink">⚙️ Settings</a> · <a href="#" id="openApp">Open App ↗</a></span>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="popup.js"></script>
+</body>
+</html>

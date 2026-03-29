@@ -1,0 +1,35 @@
+{
+  "name": "stock-platform-backend",
+  "version": "5.25.0",
+  "description": "Professional Stock Analysis Platform \u2014 Phase 5 Integrations Edition",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "install-performance": "npm install compression redis @sentry/node"
+  },
+  "keywords": [
+    "stocks",
+    "finance",
+    "nse",
+    "bse"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "mongoose": "^8.0.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "axios": "^1.6.2",
+    "node-cron": "^3.0.3"
+  },
+  "optionalDependencies": {
+    "compression": "^1.7.4",
+    "redis": "^4.6.12",
+    "@sentry/node": "^7.99.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}

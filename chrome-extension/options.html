@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>StockVision Extension Settings</title>
+  <style>
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; background:#0f172a; color:#e2e8f0; padding:32px; max-width:480px; }
+    h1 { font-size:20px; font-weight:700; color:#fff; margin-bottom:4px; }
+    .sub { font-size:13px; color:#64748b; margin-bottom:24px; }
+    label { display:block; font-size:12px; color:#94a3b8; margin-bottom:6px; }
+    input {
+      width:100%; background:#1e293b; border:1px solid #334155; border-radius:8px;
+      padding:9px 12px; font-size:13px; color:#f1f5f9; outline:none; margin-bottom:16px;
+    }
+    input:focus { border-color:#2563eb; }
+    button {
+      background:#2563eb; color:#fff; border:none; border-radius:8px;
+      padding:10px 20px; font-size:13px; font-weight:600; cursor:pointer;
+    }
+    button:hover { background:#1d4ed8; }
+    .saved { color:#4ade80; font-size:12px; margin-top:8px; display:none; }
+    .divider { border-top:1px solid #1e293b; margin:20px 0; }
+    h2 { font-size:14px; color:#94a3b8; margin-bottom:12px; }
+    .toggle-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+    .toggle-label { font-size:13px; color:#cbd5e1; }
+    input[type="checkbox"] { width:auto; margin:0; cursor:pointer; }
+  </style>
+</head>
+<body>
+  <h1>⚙️ StockVision Settings</h1>
+  <p class="sub">Configure your extension preferences</p>
+
+  <label>StockVision API URL</label>
+  <input type="url" id="apiBase" placeholder="http://localhost:5000/api" />
+
+  <label>StockVision App URL</label>
+  <input type="url" id="appBase" placeholder="http://localhost:5173" />
+
+  <div class="divider"></div>
+  <h2>Notifications</h2>
+
+  <div class="toggle-row">
+    <span class="toggle-label">Price alert notifications</span>
+    <input type="checkbox" id="notifyAlerts" checked />
+  </div>
+  <div class="toggle-row">
+    <span class="toggle-label">Show badge on alert trigger</span>
+    <input type="checkbox" id="showBadge" checked />
+  </div>
+  <div class="toggle-row">
+    <span class="toggle-label">Content script on finance sites</span>
+    <input type="checkbox" id="contentScript" checked />
+  </div>
+
+  <div class="divider"></div>
+  <button id="save">Save Settings</button>
+  <div class="saved" id="savedMsg">✓ Settings saved!</div>
+
+  <script>
+    // Load saved settings
+    chrome.storage.local.get(['apiBase','appBase','notifyAlerts','showBadge','contentScript'], (data) => {
+      document.getElementById('apiBase').value    = data.apiBase    || 'http://localhost:5000/api';
+      document.getElementById('appBase').value    = data.appBase    || 'http://localhost:5173';
+      document.getElementById('notifyAlerts').checked = data.notifyAlerts !== false;
+      document.getElementById('showBadge').checked    = data.showBadge    !== false;
+      document.getElementById('contentScript').checked = data.contentScript !== false;
+    });
+
+    document.getElementById('save').addEventListener('click', () => {
+      chrome.storage.local.set({
+        apiBase:       document.getElementById('apiBase').value,
+        appBase:       document.getElementById('appBase').value,
+        notifyAlerts:  document.getElementById('notifyAlerts').checked,
+        showBadge:     document.getElementById('showBadge').checked,
+        contentScript: document.getElementById('contentScript').checked,
+      }, () => {
+        const msg = document.getElementById('savedMsg');
+        msg.style.display = 'block';
+        setTimeout(() => msg.style.display = 'none', 2500);
+      });
+    });
+  </script>
+</body>
+</html>
