@@ -48,10 +48,11 @@ const app = express();
 // ── Security & CORS ────────────────────────────────────────────────────────
 const ALLOWED_ORIGINS = [
   process.env.FRONTEND_URL || 'http://localhost:5173',
-  'http://localhost:5173',  // vite dev
-  'http://localhost:4173',  // vite preview (PWA)
+  'http://localhost:5173',
+  'http://localhost:4173',
   'http://127.0.0.1:5173',
   'http://127.0.0.1:4173',
+  'https://stockvision-1-7dpj.onrender.com',  // ✅ production frontend
 ];
 app.use(cors({
   origin: (origin, callback) => {
