@@ -12,6 +12,10 @@ frontend/node_modules/
 # Build output
 frontend/dist/
 frontend/build/
+node_modules/
+frontend/dist/
+frontend/.env
+backend/.env
 
 # OS files
 .DS_Store
